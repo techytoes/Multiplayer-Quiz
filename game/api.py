@@ -32,7 +32,7 @@ class GameResource(ModelResource):
             fetch_id = User.objects.get(username=username).id
             user_id = Users.objects.get(id=fetch_id)
 
-            quiz = Quiz(created_by=user)
+            quiz = Quiz(created_by=user_id)
             quiz.save()
             for q in Question.objects.all():
                 if q.user_id == user_id:
