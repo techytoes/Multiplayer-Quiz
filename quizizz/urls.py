@@ -16,12 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from users.api import QuestionResource
+from game.api import GameResource
 from tastypie.api import Api
 
 v1_api = Api(api_name='v1')
 v1_api.register(QuestionResource())
 
+v2_api = Api(api_name='v2')
+v2_api.register(GameResource())
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(v1_api.urls)),
+    path('api/', include(v2_api.urls)),
 ]

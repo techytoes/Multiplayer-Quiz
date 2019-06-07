@@ -19,6 +19,3 @@ class Question(models.Model):
     option4 = models.CharField(max_length=50)
     correct = models.IntegerField()
 
-
-class Quiz(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
