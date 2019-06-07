@@ -38,7 +38,6 @@ class QuestionResource(ModelResource):
                 self.wrap_view('login'), name='api_login'),
         ]
 
-
     # Adds Question into the database of a user
     def add_question(self, request, *args, **kwargs):
         body = json.loads(request.body)
@@ -50,12 +49,13 @@ class QuestionResource(ModelResource):
 
         # Fetch ID of the user
         user_id = User.objects.get(username=username).id
+        user = Users.objects.get(id=user_id)
 
         # Check if the user is valid
         if validate_user(username, password):
 
             question = Question(
-                user_id=user_id,
+                user,
                 question_body=question_body,
                 option1=options[0],
                 option2=options[1],
@@ -64,7 +64,7 @@ class QuestionResource(ModelResource):
                 correct=correct
             )
             question.save()
-            response = {'status': True, 'Message': 'Qusestion Added Successfully'}
+            response = {'status': True, 'Message': 'Question Added Successfully'}
             return self.create_response(request, response)
 
     # Registers New User

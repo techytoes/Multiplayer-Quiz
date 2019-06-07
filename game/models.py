@@ -1,9 +1,10 @@
 from django.db import models
-# from django.contrib.postgres.fields import ArrayField
-from django.contrib.auth.models import User
 from users.models import Users, Question
+
+import uuid
 
 
 class Quiz(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    created_by = models.CharField(max_length=50)
+    quiz_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    question = models.ManyToManyField(Question)
+    created_by = models.ForeignKey(Users, on_delete=models.CASCADE)

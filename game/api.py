@@ -29,18 +29,14 @@ class GameResource(ModelResource):
 
         if validate_user(username, password):
 
-            created_by = Users.objects.get(id=User.objects.get(username=username).id).name
-            user_id = Users.objects.get(name=created_by).id
-            quiz_question = []
+            user_id = User.objects.get(username=username).id
+            user = Users.objects.get(id=user_id)
 
-            for q in Question.objects.all():
-                if q.user_id == user_id:
-                    quiz_question.append(q)
-
-            quiz = Quiz(
-                created_by = created_by,
-                question = quiz_question
-            )
+            quiz = Quiz(created_by = user)
             quiz.save()
-            quiz = {created_by : quiz_question}
-            return self.create_response(request, {'status': True, 'Quiz-Information': quiz})
+            for q in Question.objects.all():
+                if q.user == user:
+                    quiz.question.add(q)
+
+            # quiz = {created_by : quiz_question}
+            return self.create_response(request, {'status': True, 'Message': 'to be decided'})
