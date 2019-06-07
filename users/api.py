@@ -48,14 +48,14 @@ class QuestionResource(ModelResource):
         correct = body.get('correct')
 
         # Fetch ID of the user
-        user_id = User.objects.get(username=username).id
-        user = Users.objects.get(id=user_id)
+        fetch_id = User.objects.get(username=username).id
+        user_id = Users.objects.get(id=fetch_id)
 
         # Check if the user is valid
         if validate_user(username, password):
 
             question = Question(
-                user,
+                user_id=user_id,
                 question_body=question_body,
                 option1=options[0],
                 option2=options[1],
@@ -114,10 +114,13 @@ class QuestionResource(ModelResource):
             resp = {'status': False, 'message': 'incorrect password'}
             return self.create_response(request, resp)
 
+        fetch_id = User.objects.get(username=username).id
+        user_id = Users.objects.get(id=fetch_id)
+
         question_set = {}
         for q in Question.objects.all():
 
-            if q.user_id == User.objects.get(username = username).id:
+            if q.user_id == user_id:
                 question_set[q.question_body] = [q.option1, q.option2, q.option3, q.option4, q.correct]
 
         resp = {'status': True, 'Questions': question_set}

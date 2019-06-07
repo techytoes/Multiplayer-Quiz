@@ -29,13 +29,13 @@ class GameResource(ModelResource):
 
         if validate_user(username, password):
 
-            user_id = User.objects.get(username=username).id
-            user = Users.objects.get(id=user_id)
+            fetch_id = User.objects.get(username=username).id
+            user_id = Users.objects.get(id=fetch_id)
 
-            quiz = Quiz(created_by = user)
+            quiz = Quiz(created_by=user)
             quiz.save()
             for q in Question.objects.all():
-                if q.user == user:
+                if q.user_id == user_id:
                     quiz.question.add(q)
 
             # quiz = {created_by : quiz_question}

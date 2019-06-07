@@ -11,7 +11,7 @@ class Users(models.Model):
 
 
 class Question(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     question_body = models.CharField(max_length=50)
     option1 = models.CharField(max_length=50)
     option2 = models.CharField(max_length=50)
