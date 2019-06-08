@@ -162,6 +162,7 @@ class GameResource(ModelResource):
 
                 player_user_id.score = player_score
                 player_user_id.is_submitted = True
+                player_user_id.save()
 
                 return self.create_response(request, {
                     'status': True,

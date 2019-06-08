@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from users.api import QuestionResource
 from game.api import GameResource
+from leaderboard.api import LeaderBoardResource
 from tastypie.api import Api
 
 v1_api = Api(api_name='v1')
@@ -26,8 +27,14 @@ v2_api = Api(api_name='v2')
 v2_api.register(QuestionResource())
 v2_api.register(GameResource())
 
+v3_api = Api(api_name='v3')
+v3_api.register(QuestionResource())
+v3_api.register(GameResource())
+v3_api.register(LeaderBoardResource())
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(v1_api.urls)),
     path('api/', include(v2_api.urls)),
+    path('api/', include(v3_api.urls)),
 ]
