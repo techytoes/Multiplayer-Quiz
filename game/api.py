@@ -10,12 +10,12 @@ import json
 
 
 def is_allowed(username):
-    name = User.objects.get(username=username)
-    user_id = Users.objects.get(name=name)
+    user_id = User.objects.get(username=username).id
+    user_name = Users.objects.get(id=user_id).name
 
     for game in Game.objects.all():
         for user in game.allowed_users.all():
-            if user == user_id:
+            if user.name == user_name:
                 return True
     return False
 
@@ -105,7 +105,6 @@ class GameResource(ModelResource):
 
         # fetch creator Users Object
         creator_user_id = Users.objects.get(name=created_by)
-        creator_quiz = Quiz.objects.get(created_by=creator_user_id)
 
         if validate_user(username, password):
 
