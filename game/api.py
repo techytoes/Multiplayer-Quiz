@@ -114,7 +114,6 @@ class GameResource(ModelResource):
                         for j in i.question.all():
                             quiz[j.question_body] = [j.option1, j.option2, j.option3, j.option4]
 
-
                 return self.create_response(request, {
                     'status': True,
                     'Message': 'Welcome : ' + player_user_id.name,
@@ -161,15 +160,9 @@ class GameResource(ModelResource):
                     if responses[q] == question_set[q].correct:
                         player_score += 1
 
-                user_settings = Users(
-                    user=player,
-                    name=player_user_id.name,
-                    date_of_birth=player_user_id.date_of_birth,
-                    occupation=player_user_id.occupation,
-                    score=player_score,
-                    is_submitted=True,
-                )
-                user_settings.save()
+                player_user_id.score = player_score
+                player_user_id.is_submitted = True
+
                 return self.create_response(request, {
                     'status': True,
                     'Message': 'Responses submitted for :' + player_user_id.name,
