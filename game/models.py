@@ -11,5 +11,6 @@ class Quiz(models.Model):
 
 
 class Game(models.Model):
+    game_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    allowed_users = models.CharField(max_length=50)
+    allowed_users = models.ManyToManyField(Users)

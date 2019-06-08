@@ -9,6 +9,17 @@ from users.api import validate_user
 import json
 
 
+def is_allowed(username):
+    name = User.objects.get(username=username)
+    user_id = Users.objects.get(name=name)
+
+    for game in Game.objects.all():
+        for user in game.allowed_users.all():
+            if user == user_id:
+                return True
+    return False
+
+
 class GameResource(ModelResource):
     class Meta:
         queryset = Quiz.objects.all()
@@ -59,9 +70,7 @@ class GameResource(ModelResource):
         body = json.loads(request.body)
         username = body.get('username')
         password = body.get('password')
-        users_allowed = body.get('allowed_users')
-
-        allowed_users = " ".join(i for i in users_allowed)
+        allowed_users = body.get('allowed_users')
 
         if validate_user(username, password):
 
@@ -70,11 +79,13 @@ class GameResource(ModelResource):
             user_id = Users.objects.get(id=fetch_id)
             quiz = Quiz.objects.get(created_by=user_id)
 
-            game = Game(
-                quiz=quiz,
-                allowed_users=allowed_users,
-            )
+            game = Game(quiz=quiz)
             game.save()
+
+            for name in allowed_users:
+                user = Users.objects.get(name=name)
+                game.allowed_users.add(user)
+
             # Returns the link to created Quiz
             return self.create_response(request, {
                 'status': True,
@@ -98,8 +109,7 @@ class GameResource(ModelResource):
 
         if validate_user(username, password):
 
-            users_allowed = Game.objects.get(quiz=creator_quiz).allowed_users
-            if username not in users_allowed:
+            if not is_allowed(username):
                 return self.create_response(request, {
                     'status':True,
                     'Message':'User not allowed to view/play the game'
@@ -140,8 +150,7 @@ class GameResource(ModelResource):
 
         if validate_user(username, password):
 
-            users_allowed = Game.objects.get(quiz=creator_quiz).allowed_users
-            if username not in users_allowed:
+            if not is_allowed(username):
                 return self.create_response(request, {
                     'status':True,
                     'Message':'User not allowed to view/play the game'
