@@ -95,7 +95,8 @@ class QuestionResource(ModelResource):
             name=name,
             date_of_birth=date_of_birth,
             occupation=occupation,
-            score=0
+            score=0,
+            is_submitted=False,
         )
         user_settings.save()
         return self.create_response(request, {'status': True, 'Message': 'Registration Successful'})

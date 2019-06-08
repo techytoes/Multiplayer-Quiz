@@ -23,6 +23,7 @@ v1_api = Api(api_name='v1')
 v1_api.register(QuestionResource())
 
 v2_api = Api(api_name='v2')
+v2_api.register(QuestionResource())
 v2_api.register(GameResource())
 
 urlpatterns = [

@@ -49,7 +49,10 @@ class GameResource(ModelResource):
                 if q.user_id == user_id:
                     quiz.question.add(q)
 
-            return self.create_response(request, {'status': True, 'Message': 'Quiz created by:' + user_id.name})
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Quiz created by:' + user_id.name
+            })
 
     # Allow a user to create game
     def create_game(self, request, *args, **kwargs):
@@ -103,7 +106,7 @@ class GameResource(ModelResource):
                 })
 
             else:
-                
+
                 quiz = {}
                 for i in Quiz.objects.all():
 
@@ -111,23 +114,63 @@ class GameResource(ModelResource):
                         for j in i.question.all():
                             quiz[j.question_body] = [j.option1, j.option2, j.option3, j.option4]
 
+
                 return self.create_response(request, {
                     'status': True,
                     'Message': 'Welcome : ' + player_user_id.name,
                     'Quiz-Questions': quiz
                 })
 
-    # # Allows user to submit responses
-    # def submit_ans(self, request, *args, **kwargs):
-    #     body = json.loads(request.body)
-    #     username = body.get('username')
-    #     password = body.get('password')
-    #     responses = body.get('responses')
-    #
-    #     if validate_user(username, password):
-    #
-    #         if username not in users_allowed:
-    #             return self.create_response(request, {'status':True, 'Message':'User not allowed to view/play the game'})
-    #
-    #         else:
-    #             # Check the responses with correct option for those questions And update score accordingly
+    # Allows user to submit responses
+    def submit_ans(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        username = body.get('username')
+        password = body.get('password')
+        created_by = body.get('created_by')
+        responses = body.get('responses')
+
+        # fetch player current score
+        player = User.objects.get(username=username)
+        player_fetch_id = player.id
+        player_user_id = Users.objects.get(id=player_fetch_id)
+        player_score = player_user_id.score
+
+        # fetch creator Users Object
+        creator_user_id = Users.objects.get(name=created_by)
+        creator_quiz = Quiz.objects.get(created_by=creator_user_id)
+
+        if validate_user(username, password):
+
+            users_allowed = Game.objects.get(quiz=creator_quiz).allowed_users
+            if username not in users_allowed:
+                return self.create_response(request, {
+                    'status':True,
+                    'Message':'User not allowed to view/play the game'
+                })
+
+            elif player_user_id.is_submitted:
+                return self.create_response(request, {
+                    'status': True,
+                    'Message': 'Responses submitted already. Go to leader-board to view scores.',
+                })
+
+            else:
+
+                question_set = creator_quiz.question.all().order_by('id').reverse()
+                for q in range(question_set.count()):
+                    if responses[q] == question_set[q].correct:
+                        player_score += 1
+
+                user_settings = Users(
+                    user=player,
+                    name=player_user_id.name,
+                    date_of_birth=player_user_id.date_of_birth,
+                    occupation=player_user_id.occupation,
+                    score=player_score,
+                    is_submitted=True,
+                )
+                user_settings.save()
+                return self.create_response(request, {
+                    'status': True,
+                    'Message': 'Responses submitted for :' + player_user_id.name,
+                })

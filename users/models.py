@@ -8,6 +8,7 @@ class Users(models.Model):
     date_of_birth = models.DateField(auto_now=False, auto_now_add=False, default="2000-01-01")
     occupation = models.CharField(max_length=50)
     score = models.BigIntegerField(default=0)
+    is_submitted = models.BooleanField(default=False)
 
 
 class Question(models.Model):
