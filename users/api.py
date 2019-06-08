@@ -47,12 +47,11 @@ class QuestionResource(ModelResource):
         options = body.get('options')
         correct = body.get('correct')
 
-        # Fetch ID of the user
-        fetch_id = User.objects.get(username=username).id
-        user_id = Users.objects.get(id=fetch_id)
-
         # Check if the user is valid
         if validate_user(username, password):
+            # Fetch ID of the user
+            fetch_id = User.objects.get(username=username).id
+            user_id = Users.objects.get(id=fetch_id)
 
             question = Question(
                 user_id=user_id,
