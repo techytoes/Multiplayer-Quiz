@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.models import User
 from users.models import Question, Users
-from game.models import Quiz
+from game.models import Quiz, Game
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
 from users.api import validate_user
@@ -9,7 +9,6 @@ from users.api import validate_user
 import json
 
 
-allowed_users = []
 class GameResource(ModelResource):
     class Meta:
         queryset = Quiz.objects.all()
@@ -50,46 +49,85 @@ class GameResource(ModelResource):
                 if q.user_id == user_id:
                     quiz.question.add(q)
 
-            # quiz = {created_by : quiz_question}
-            return self.create_response(request, {'status': True, 'Message': 'to be decided'})
+            return self.create_response(request, {'status': True, 'Message': 'Quiz created by:' + user_id.name})
 
     # Allow a user to create game
     def create_game(self, request, *args, **kwargs):
         body = json.loads(request.body)
         username = body.get('username')
         password = body.get('password')
-        allowed_users = body.get('allowed_users')
+        users_allowed = body.get('allowed_users')
+
+        allowed_users = " ".join(i for i in users_allowed)
 
         if validate_user(username, password):
+
+            # Fetch quiz object for creator user
+            fetch_id = User.objects.get(username=username).id
+            user_id = Users.objects.get(id=fetch_id)
+            quiz = Quiz.objects.get(created_by=user_id)
+
+            game = Game(
+                quiz=quiz,
+                allowed_users=allowed_users,
+            )
+            game.save()
             # Returns the link to created Quiz
-            return self.create_response(request, {'status': True, 'Game created at ' : '127.0.0.1:8000/api/v2/play/game/'})
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Game created at - https://127.0.0.1:8000/api/v2/play/game/'
+            })
 
     # Allows user to view quiz
     def play_game(self, request, *args, **kwargs):
         body = json.loads(request.body)
         username = body.get('username')
         password = body.get('password')
+        created_by = body.get('created_by')
+
+        # fetch player Users object
+        player_fetch_id = User.objects.get(username=username).id
+        player_user_id = Users.objects.get(id=player_fetch_id)
+
+        # fetch creator Users Object
+        creator_user_id = Users.objects.get(name=created_by)
+        creator_quiz = Quiz.objects.get(created_by=creator_user_id)
 
         if validate_user(username, password):
 
-            if username not in allowed_users:
-                return self.create_response(request, {'status':True, 'Message':'User not allowed to view/play the game'})
+            users_allowed = Game.objects.get(quiz=creator_quiz).allowed_users
+            if username not in users_allowed:
+                return self.create_response(request, {
+                    'status':True,
+                    'Message':'User not allowed to view/play the game'
+                })
 
             else:
-                # Will insert in a dictionary here and create a response once I know how to iterate through quiz.
+                
+                quiz = {}
+                for i in Quiz.objects.all():
 
-    # Allows user to submit responses
-    def submit_ans(self, request, *args, **kwargs):
-        body = json.loads(request.body)
-        username = body.get('username')
-        password = body.get('password')
-        responses = body.get('responses')
+                    if i.created_by == creator_user_id:
+                        for j in i.question.all():
+                            quiz[j.question_body] = [j.option1, j.option2, j.option3, j.option4]
 
-        if validate_user(username, password):
+                return self.create_response(request, {
+                    'status': True,
+                    'Message': 'Welcome : ' + player_user_id.name,
+                    'Quiz-Questions': quiz
+                })
 
-            if username not in allowed_users:
-                return self.create_response(request, {'status':True, 'Message':'User not allowed to view/play the game'})
-
-            else:
-                # Check the responses with correct option for those questions
-                # And update score accordingly
+    # # Allows user to submit responses
+    # def submit_ans(self, request, *args, **kwargs):
+    #     body = json.loads(request.body)
+    #     username = body.get('username')
+    #     password = body.get('password')
+    #     responses = body.get('responses')
+    #
+    #     if validate_user(username, password):
+    #
+    #         if username not in users_allowed:
+    #             return self.create_response(request, {'status':True, 'Message':'User not allowed to view/play the game'})
+    #
+    #         else:
+    #             # Check the responses with correct option for those questions And update score accordingly

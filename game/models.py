@@ -9,5 +9,7 @@ class Quiz(models.Model):
     question = models.ManyToManyField(Question)
     created_by = models.ForeignKey(Users, on_delete=models.CASCADE)
 
+
 class Game(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    allowed_users = models.CharField(max_length=50)
