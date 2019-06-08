@@ -66,6 +66,12 @@ class QuestionResource(ModelResource):
             response = {'status': True, 'Message': 'Question Added Successfully'}
             return self.create_response(request, response)
 
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })
+
     # Registers New User
     def register(self, request, *args, **kwargs):
         body = json.loads(request.body)

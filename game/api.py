@@ -65,6 +65,12 @@ class GameResource(ModelResource):
                 'Message': 'Quiz created by:' + user_id.name
             })
 
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })
+
     # Allow a user to create game
     def create_game(self, request, *args, **kwargs):
         body = json.loads(request.body)
@@ -90,6 +96,12 @@ class GameResource(ModelResource):
             return self.create_response(request, {
                 'status': True,
                 'Message': 'Game created at - https://127.0.0.1:8000/api/v2/play/game/'
+            })
+
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
             })
 
     # Allows user to view quiz
@@ -128,6 +140,12 @@ class GameResource(ModelResource):
                     'Message': 'Welcome : ' + player_user_id.name,
                     'Quiz-Questions': quiz
                 })
+
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })
 
     # Allows user to submit responses
     def submit_ans(self, request, *args, **kwargs):
@@ -176,3 +194,9 @@ class GameResource(ModelResource):
                     'status': True,
                     'Message': 'Responses submitted for :' + player_user_id.name,
                 })
+
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })

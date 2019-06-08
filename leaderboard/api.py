@@ -37,3 +37,9 @@ class LeaderBoardResource(ModelResource):
                 'status': True,
                 'Current Leaderboard': user_display
             })
+
+        else:
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })
