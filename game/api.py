@@ -1,28 +1,12 @@
 from django.conf.urls import url
-from django.contrib.auth.models import User
 from users.models import Question, Users
 from game.models import Quiz, Game
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
-from users.api import validate_user, fetch_id
+from users.utils import validate_user, fetch_id
+from game.utils import is_allowed
 
 import json
-
-'''
-HELPER FUNCTIONS
-'''
-
-
-# Checks if the user is allowed to participate in the Game
-def is_allowed(username):
-
-    user_name = fetch_id(username).name
-    for game in Game.objects.all():
-        for user in game.allowed_users.all():
-            if user.name == user_name:
-                return True
-    return False
-
 
 '''
 RESOURCES
@@ -75,7 +59,7 @@ class GameResource(ModelResource):
 
         else:
             return self.create_response(request, {
-                'status': True,
+                'status': False,
                 'Message': 'Invalid Credentials'
             })
 
@@ -89,8 +73,7 @@ class GameResource(ModelResource):
         if validate_user(username, password):
 
             # Fetch quiz object for creator user
-            fetch_id = User.objects.get(username=username).id
-            user_id = Users.objects.get(id=fetch_id)
+            user_id = fetch_id(username)
             quiz = Quiz.objects.get(created_by=user_id)
 
             game = Game(quiz=quiz)
@@ -108,7 +91,7 @@ class GameResource(ModelResource):
 
         else:
             return self.create_response(request, {
-                'status': True,
+                'status': False,
                 'Message': 'Invalid Credentials'
             })
 
@@ -129,18 +112,15 @@ class GameResource(ModelResource):
 
             if not is_allowed(username):
                 return self.create_response(request, {
-                    'status':True,
+                    'status':False,
                     'Message':'User not allowed to view/play the game'
                 })
 
             else:
 
                 quiz = {}
-                for i in Quiz.objects.all():
-
-                    if i.created_by == creator_user_id:
-                        for j in i.question.all():
-                            quiz[j.question_body] = [j.option1, j.option2, j.option3, j.option4]
+                for j in Quiz.objects.get(created_by=creator_user_id).question.all():
+                    quiz[j.question_body] = [j.option1, j.option2, j.option3, j.option4]
 
                 return self.create_response(request, {
                     'status': True,
@@ -174,7 +154,7 @@ class GameResource(ModelResource):
 
             if not is_allowed(username):
                 return self.create_response(request, {
-                    'status':True,
+                    'status': False,
                     'Message':'User not allowed to view/play the game'
                 })
 

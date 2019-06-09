@@ -4,32 +4,9 @@ from django.contrib.auth.hashers import check_password
 from users.models import Question, Users
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
+from users.utils import validate_user, fetch_id
 
 import json
-
-'''
-HELPER FUNCTIONS
-'''
-
-
-# Validating User for correct Credentials
-def validate_user(username, password):
-    user = User.objects.filter(username=username)
-    if user.count() < 1:
-        return False
-    if not check_password(password, user.first().password):
-        return False
-    return True
-
-
-# Fetch Users object
-def fetch_id(username):
-
-    find_id = User.objects.get(username=username).id
-    user_id = Users.objects.get(id=find_id)
-
-    return user_id
-
 
 '''
 RESOURCES
@@ -84,7 +61,7 @@ class QuestionResource(ModelResource):
 
         else:
             return self.create_response(request, {
-                'status': True,
+                'status': False,
                 'Message': 'Invalid Credentials'
             })
 
