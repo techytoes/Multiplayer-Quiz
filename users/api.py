@@ -7,6 +7,10 @@ from tastypie.utils.urls import trailing_slash
 
 import json
 
+'''
+HELPER FUNCTIONS
+'''
+
 
 # Validating User for correct Credentials
 def validate_user(username, password):
@@ -16,6 +20,20 @@ def validate_user(username, password):
     if not check_password(password, user.first().password):
         return False
     return True
+
+
+# Fetch Users object
+def fetch_id(username):
+
+    find_id = User.objects.get(username=username).id
+    user_id = Users.objects.get(id=find_id)
+
+    return user_id
+
+
+'''
+RESOURCES
+'''
 
 
 class QuestionResource(ModelResource):
@@ -49,10 +67,8 @@ class QuestionResource(ModelResource):
 
         # Check if the user is valid
         if validate_user(username, password):
-            # Fetch ID of the user
-            fetch_id = User.objects.get(username=username).id
-            user_id = Users.objects.get(id=fetch_id)
 
+            user_id = fetch_id(username)
             question = Question(
                 user_id=user_id,
                 question_body=question_body,
@@ -120,9 +136,7 @@ class QuestionResource(ModelResource):
             resp = {'status': False, 'message': 'incorrect password'}
             return self.create_response(request, resp)
 
-        fetch_id = User.objects.get(username=username).id
-        user_id = Users.objects.get(id=fetch_id)
-
+        user_id = fetch_id(username)
         question_set = {}
         for q in Question.objects.all():
 

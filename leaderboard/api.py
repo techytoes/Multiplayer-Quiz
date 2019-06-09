@@ -1,10 +1,15 @@
 from django.conf.urls import url
-from users.models import Question, Users
+from users.models import Users
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
 from users.api import validate_user
 
 import json
+
+
+'''
+RESOURCES
+'''
 
 
 class LeaderBoardResource(ModelResource):
@@ -21,6 +26,7 @@ class LeaderBoardResource(ModelResource):
                 self.wrap_view('leaderboard'), name='api_leaderboard'),
         ]
 
+    # Displays leaderboard
     def leaderboard(self, request, *args, **kwargs):
         body = json.loads(request.body)
         username = body.get('username')

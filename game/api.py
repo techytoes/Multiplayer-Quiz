@@ -4,15 +4,19 @@ from users.models import Question, Users
 from game.models import Quiz, Game
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
-from users.api import validate_user
+from users.api import validate_user, fetch_id
 
 import json
 
+'''
+HELPER FUNCTIONS
+'''
 
+
+# Checks if the user is allowed to participate in the Game
 def is_allowed(username):
-    user_id = User.objects.get(username=username).id
-    user_name = Users.objects.get(id=user_id).name
 
+    user_name = fetch_id(username).name
     for game in Game.objects.all():
         for user in game.allowed_users.all():
             if user.name == user_name:
@@ -20,7 +24,13 @@ def is_allowed(username):
     return False
 
 
+'''
+RESOURCES
+'''
+
+
 class GameResource(ModelResource):
+
     class Meta:
         queryset = Quiz.objects.all()
         quiz_resource = 'quiz'
@@ -51,9 +61,7 @@ class GameResource(ModelResource):
 
         if validate_user(username, password):
 
-            fetch_id = User.objects.get(username=username).id
-            user_id = Users.objects.get(id=fetch_id)
-
+            user_id = fetch_id(username)
             quiz = Quiz(created_by=user_id)
             quiz.save()
             for q in Question.objects.all():
@@ -112,8 +120,7 @@ class GameResource(ModelResource):
         created_by = body.get('created_by')
 
         # fetch player Users object
-        player_fetch_id = User.objects.get(username=username).id
-        player_user_id = Users.objects.get(id=player_fetch_id)
+        player_user_id = fetch_id(username)
 
         # fetch creator Users Object
         creator_user_id = Users.objects.get(name=created_by)
@@ -156,9 +163,7 @@ class GameResource(ModelResource):
         responses = body.get('responses')
 
         # fetch player current score
-        player = User.objects.get(username=username)
-        player_fetch_id = player.id
-        player_user_id = Users.objects.get(id=player_fetch_id)
+        player_user_id = fetch_id(username)
         player_score = player_user_id.score
 
         # fetch creator Users Object
