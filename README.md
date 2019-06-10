@@ -34,6 +34,6 @@ The Server will start on http://127.0.0.1:8000/
 |   Add Question  |   http://127.0.0.1:8000/api/v3/question/add/   | username, password,  question_body, options(list of int), correct option(int) |    Question added successfully   |
 |     Add Quiz    |     http://127.0.0.1:8000/api/v3/quiz/add/     |                               username, password                              |      Quiz added Successfully     |
 |   Create Game   |    http://127.0.0.1:8000/api/v3/create/game/   |                       username, password, allowed_users(list of names)                       |     Game created Successfully    |
-|    Play Game    |     http://127.0.0.1:8000/api/v3/play/game/    |                         username, password, created_by                        |      Display Game Questions      |
-| Submit Response | http://127.0.0.1:8000/api/v3/play/game/submit/ |                   username, password, created_by, responses                   | Responses submitted successfully |
+|    Play Game    |     http://127.0.0.1:8000/api/v3/play/game/    |                         username, password, created_by(name)                        |      Display Game Questions      |
+| Submit Response | http://127.0.0.1:8000/api/v3/play/game/submit/ |                   username, password, created_by(name), responses(list of int)                   | Responses submitted successfully |
 |   Leaderboard   |    http://127.0.0.1:8000/api/v3/leaderboard/   |                               username, password                              |            Leaderboard           |
