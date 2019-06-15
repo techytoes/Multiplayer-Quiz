@@ -1,6 +1,6 @@
 from users.models import Users
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import check_password
+from users.authentication import KeyAuthentication
 
 '''
 HELPER FUNCTIONS
@@ -8,19 +8,20 @@ HELPER FUNCTIONS
 
 
 # Validating User for correct Credentials
-def validate_user(username, password):
-    user = User.objects.filter(username=username)
-    if user.count() < 1:
-        return False
-    if not check_password(password, user.first().password):
+def valid_user(request, api_key):
+
+    auth = KeyAuthentication()
+    if auth.get_key(request, api_key=api_key) is not True:
         return False
     return True
 
 
 # Fetch Users object
-def fetch_id(username):
+def fetch_id(api_key):
 
-    find_id = User.objects.get(username=username).id
+    for u in User.objects.all():
+        if u.api_key.key == api_key:
+            find_id = u.id
+
     user_id = Users.objects.get(id=find_id)
-
     return user_id

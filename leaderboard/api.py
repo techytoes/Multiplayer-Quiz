@@ -2,7 +2,7 @@ from django.conf.urls import url
 from users.models import Users
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
-from users.api import validate_user
+from users.api import valid_user
 
 import json
 
@@ -29,23 +29,22 @@ class LeaderBoardResource(ModelResource):
     # Displays leaderboard
     def leaderboard(self, request, *args, **kwargs):
         body = json.loads(request.body)
-        username = body.get('username')
-        password = body.get('password')
+        api_key = body.get('api_key')
 
-        if validate_user(username, password):
+        if not valid_user(request, api_key=api_key):
+
+            return self.create_response(request, {
+                'status': True,
+                'Message': 'Invalid Credentials'
+            })
+
+        else:
 
             user_display = {}
-
             for u in Users.objects.all():
                 user_display[u.name] = u.score
 
             return self.create_response(request, {
                 'status': True,
                 'Current Leaderboard': user_display
-            })
-
-        else:
-            return self.create_response(request, {
-                'status': True,
-                'Message': 'Invalid Credentials'
             })
