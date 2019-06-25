@@ -1,6 +1,6 @@
-# Quizizz
+# Multiplayer Quiz
 
-This project is made as a part of assignment for the backend intern position at Quizizz.
+This is a multiplayer Quiz based web application.
 
 ### Steps to run server -
 
@@ -8,8 +8,8 @@ Step-1 : Create virtual Environment - [Resource](https://packaging.python.org/gu
 
 Step-2 : Clone this repo.
 ```
-$ git clone https://github.com/techytoes/Quizizz.git
-$ cd Quizizz
+$ git clone https://github.com/techytoes/Multiplayer-Quiz.git
+$ cd Multiplayer-Quiz
 ```
 
 Step-3 : Install python libraries and packages.
